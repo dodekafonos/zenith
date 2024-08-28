@@ -4,17 +4,16 @@ import logo from '../assets/health2-removebg.png';
 import { useNavigate } from 'react-router-dom';
 
 interface SideBarProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onSelect: (show: any) => void;
+  onSelect: (componentName: string) => void;
 }
 
-function SideBarComponent ({ onSelect }: SideBarProps) {
-    const navigate = useNavigate()
+function SideBarComponent({ onSelect }: SideBarProps) {
+  const navigate = useNavigate();
 
-    const handleLogout = () => {
-        navigate('/')
-    }
-    
+  const handleLogout = () => {
+    navigate('/');
+  };
+
   return (
     <Box 
       w='100px' 
@@ -24,17 +23,15 @@ function SideBarComponent ({ onSelect }: SideBarProps) {
       flexDirection='column' 
       justifyContent='space-between' 
       alignItems='center'
-      position="fixed" // Fixando a sidebar na tela
-      top={0} // Mantendo-a no topo
-      left={0} // Mantendo-a à esquerda
+      position="fixed"
+      top={0}
+      left={0}
       py={4}
     >
-      {/* Logo */}
       <Box mb={5}>
         <Image src={logo} alt="Health Logo" boxSize="50px" />
       </Box>
 
-      {/* Icones */}
       <VStack spacing={12}>
         <Tooltip label="Home" fontSize="md">
           <IconButton 
@@ -43,7 +40,7 @@ function SideBarComponent ({ onSelect }: SideBarProps) {
             color='white'
             bgColor='green.900'
             _hover={{ bg: 'green.700' }}
-            onClick={() => onSelect('home')}
+            onClick={() => onSelect('Home')}
             size="lg"
           />
         </Tooltip>
@@ -54,7 +51,7 @@ function SideBarComponent ({ onSelect }: SideBarProps) {
             color='white'
             bgColor='green.900'
             _hover={{ bg: 'green.700' }}
-            onClick={() => onSelect('user')}
+            onClick={() => onSelect('User')}
             size="lg"
           />
         </Tooltip>
@@ -65,24 +62,23 @@ function SideBarComponent ({ onSelect }: SideBarProps) {
             color='white'
             bgColor='green.900'
             _hover={{ bg: 'green.700' }}
-            onClick={() => onSelect('statistics')}
+            onClick={() => onSelect('Statistics')}
             size="lg"
           />
         </Tooltip>
-        <Tooltip label="Dados" fontSize="md"    >
+        <Tooltip label="Dados" fontSize="md">
           <IconButton 
             icon={<FaDatabase size="28px" />} 
             aria-label="Dados" 
             color='white'
             bgColor='green.900'
             _hover={{ bg: 'green.700' }}
-            onClick={() => onSelect('data')}
+            onClick={() => onSelect('Data')}
             size="lg"
           />
         </Tooltip>
       </VStack>
 
-      {/* Logout */}
       <Tooltip label="Logout" fontSize="md">
         <IconButton 
           icon={<FaSignOutAlt size="28px" />} 
