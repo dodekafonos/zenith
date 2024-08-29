@@ -1,7 +1,7 @@
 import { Box, IconButton, VStack, Image, Tooltip } from '@chakra-ui/react';
-import { FaHome, FaUser, FaChartBar, FaDatabase, FaSignOutAlt } from 'react-icons/fa';
-import logo from '../assets/health2-removebg.png';
+import { FaHome, FaUser, FaChartBar, FaDatabase, FaSignOutAlt, FaFileMedical } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import logo from '../assets/health2-removebg.png';
 
 interface SideBarProps {
   onSelect: (componentName: string) => void;
@@ -9,10 +9,6 @@ interface SideBarProps {
 
 function SideBarComponent({ onSelect }: SideBarProps) {
   const navigate = useNavigate();
-
-  const handleLogout = () => {
-    navigate('/');
-  };
 
   return (
     <Box 
@@ -44,25 +40,14 @@ function SideBarComponent({ onSelect }: SideBarProps) {
             size="lg"
           />
         </Tooltip>
-        <Tooltip label="User" fontSize="md">
+        <Tooltip label="Anamnese" fontSize="md">
           <IconButton 
-            icon={<FaUser size="28px" />} 
-            aria-label="User" 
+            icon={<FaFileMedical size="28px" />} 
+            aria-label="Anamnese" 
             color='white'
             bgColor='green.900'
             _hover={{ bg: 'green.700' }}
-            onClick={() => onSelect('User')}
-            size="lg"
-          />
-        </Tooltip>
-        <Tooltip label="Estatísticas" fontSize="md">
-          <IconButton 
-            icon={<FaChartBar size="28px" />} 
-            aria-label="Estatísticas" 
-            color='white'
-            bgColor='green.900'
-            _hover={{ bg: 'green.700' }}
-            onClick={() => onSelect('Statistics')}
+            onClick={() => onSelect('anamnesis')}
             size="lg"
           />
         </Tooltip>
@@ -73,7 +58,29 @@ function SideBarComponent({ onSelect }: SideBarProps) {
             color='white'
             bgColor='green.900'
             _hover={{ bg: 'green.700' }}
-            onClick={() => onSelect('Data')}
+            onClick={() => onSelect('data')}
+            size="lg"
+          />
+        </Tooltip>
+        <Tooltip label="Estatísticas" fontSize="md">
+          <IconButton 
+            icon={<FaChartBar size="28px" />} 
+            aria-label="Estatísticas" 
+            color='white'
+            bgColor='green.900'
+            _hover={{ bg: 'green.700' }}
+            onClick={() => onSelect('statistics')}
+            size="lg"
+          />
+        </Tooltip>
+        <Tooltip label="User" fontSize="md">
+          <IconButton 
+            icon={<FaUser size="28px" />} 
+            aria-label="User" 
+            color='white'
+            bgColor='green.900'
+            _hover={{ bg: 'green.700' }}
+            onClick={() => onSelect('user')}
             size="lg"
           />
         </Tooltip>
@@ -86,7 +93,7 @@ function SideBarComponent({ onSelect }: SideBarProps) {
           color='white'
           bgColor='green.600'
           _hover={{ bg: 'red.500' }}
-          onClick={handleLogout}
+          onClick={() => navigate('/')}
           size="lg"
           mt={4}
         />

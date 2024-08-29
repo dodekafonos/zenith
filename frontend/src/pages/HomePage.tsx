@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Box } from '@chakra-ui/react';
 import SideBarComponent from '../components/SideBarComponent';
-import { HomeComponent, UserComponent, StatisticsComponent, DataComponent } from '../components/home/Components';
+import { HomeComponent, UserComponent, StatisticsComponent, DataComponent, AnamnesisFormComponent } from '../components/home/Components';
 
 function HomePage() {
   const [selectedComponent, setSelectedComponent] = useState('Home');
@@ -10,12 +10,14 @@ function HomePage() {
     switch (selectedComponent) {
       case 'Home':
         return <HomeComponent />;
-      case 'User':
+      case 'user':
         return <UserComponent />;
-      case 'Statistics':
+      case 'statistics':
         return <StatisticsComponent />;
-      case 'Data':
+      case 'data':
         return <DataComponent />;
+      case 'anamnesis':
+        return <AnamnesisFormComponent/>;
       default:
         return <HomeComponent />;
     }
@@ -27,7 +29,7 @@ function HomePage() {
       <SideBarComponent onSelect={setSelectedComponent} />
 
       {/* Conteúdo à direita da sidebar */}
-      <Box flex="1" ml="5%" p={4} bgColor="gray.50" h="100vh" overflowY="auto">
+      <Box flex="1" ml="7%" p={4} bgColor="gray.50" h="100vh" overflowY="auto">
         {renderSelectedComponent()}
       </Box>
     </Box>

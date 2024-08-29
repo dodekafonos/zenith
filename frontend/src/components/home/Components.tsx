@@ -1,4 +1,4 @@
-import { Box, Heading, Text } from '@chakra-ui/react';
+import { Box, Heading, Text, FormControl, FormLabel, Input, Textarea, VStack, Button } from '@chakra-ui/react';
 import HomeCarousel from './HomeCarousel';
 
 export function HomeComponent() {
@@ -30,10 +30,60 @@ export function StatisticsComponent() {
 }
 
 export function DataComponent() {
+  const anamnesisData = {
+    historicoMedico: 'Histórico médico exemplo...',
+    alergias: 'Nenhuma',
+    medicamentos: 'Nenhum',
+  };
+
   return (
     <Box p={6}>
-      <Heading>Dados</Heading>
-      <Text>Acesse seus dados de saúde e registros médicos.</Text>
+      <Heading>Seus Dados de Anamnese</Heading>
+      <VStack align="start" mt={4} spacing={4}>
+        <Box>
+          <Text fontWeight="bold">Histórico Médico:</Text>
+          <Text>{anamnesisData.historicoMedico}</Text>
+        </Box>
+        <Box>
+          <Text fontWeight="bold">Alergias:</Text>
+          <Text>{anamnesisData.alergias}</Text>
+        </Box>
+        <Box>
+          <Text fontWeight="bold">Medicamentos em Uso:</Text>
+          <Text>{anamnesisData.medicamentos}</Text>
+        </Box>
+      </VStack>
+      <Button mt={6} colorScheme="red">Excluir Dados</Button>
     </Box>
   );
 }
+
+export function AnamnesisFormComponent() {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Aqui você vai adicionar a lógica para salvar os dados de anamnese no banco de dados
+  };
+
+  return (
+    <Box p={6}>
+      <Heading mb={5}>Insira seus dados para Anamnese:</Heading>
+      <form onSubmit={handleSubmit}>
+        <VStack spacing={4}>
+          <FormControl id="historico-medico" isRequired>
+            <FormLabel>Histórico Médico</FormLabel>
+            <Textarea placeholder="Descreva seu histórico médico..." />
+          </FormControl>
+          <FormControl id="alergias">
+            <FormLabel>Alergias</FormLabel>
+            <Input placeholder="Informe suas alergias" />
+          </FormControl>
+          <FormControl id="medicamentos">
+            <FormLabel>Medicamentos em Uso</FormLabel>
+            <Input placeholder="Informe os medicamentos em uso" />
+          </FormControl>
+          <Button type="submit" colorScheme="green">Salvar Dados</Button>
+        </VStack>
+      </form>
+    </Box>
+  );
+};
