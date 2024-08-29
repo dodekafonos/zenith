@@ -21,7 +21,7 @@ function LoginComponent({ setShowSignUp }: LoginComponentProps) {
       boxShadow='lg'
       display='flex' 
       flexDir='column' 
-      gap={6}
+      gap={7}
       border='2px'
       borderColor='green.700'
     >

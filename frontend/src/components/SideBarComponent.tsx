@@ -39,7 +39,7 @@ function SideBarComponent({ onSelect }: SideBarProps) {
             onClick={() => onSelect('Home')}
             size="lg"
           />
-        </Tooltip>
+        </Tooltip>  
         <Tooltip label="Anamnese" fontSize="md">
           <IconButton 
             icon={<FaFileMedical size="28px" />} 

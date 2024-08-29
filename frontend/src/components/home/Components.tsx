@@ -1,4 +1,22 @@
-import { Box, Heading, Text, FormControl, FormLabel, Input, Textarea, VStack, Button } from '@chakra-ui/react';
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Button,
+  useDisclosure,
+  Box,
+  Heading,
+  VStack,
+  Text,
+  FormControl,
+  FormLabel,
+  Textarea,
+  Input
+} from '@chakra-ui/react'
 import HomeCarousel from './HomeCarousel';
 
 export function HomeComponent() {
@@ -30,11 +48,17 @@ export function StatisticsComponent() {
 }
 
 export function DataComponent() {
+  const { isOpen, onOpen, onClose } = useDisclosure()
+
   const anamnesisData = {
     historicoMedico: 'Histórico médico exemplo...',
     alergias: 'Nenhuma',
     medicamentos: 'Nenhum',
-  };
+  }
+
+  const handleModal = () => {
+    onOpen()
+  } 
 
   return (
     <Box p={6}>
@@ -53,10 +77,29 @@ export function DataComponent() {
           <Text>{anamnesisData.medicamentos}</Text>
         </Box>
       </VStack>
+      <Button mt={6} mr={4} bgColor="lightgray" onClick={handleModal}>Uso dos dados</Button>
       <Button mt={6} colorScheme="red">Excluir Dados</Button>
+
+      <Modal
+        onClose={onClose}
+        isOpen={isOpen}      
+        >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Como seu dados são utilizados?</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Box>Um baita textão aqui</Box>
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={onClose}>Close</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
-  );
+  )
 }
+
 
 export function AnamnesisFormComponent() {
   const handleSubmit = (e: React.FormEvent) => {
