@@ -1,62 +1,34 @@
-from flask import Blueprint, jsonify, request
-from .database import mongo
-from .models import Usuario
-from .schemas import UsuarioSchema
+from flask import request, jsonify, current_app as app
+from . import mongo
 
-api_blueprint = Blueprint('api', __name__)
+@app.route('/api/anamnesis', methods=['POST'])
+def create_anamnesis():
+    data = request.json
+    if not data or not 'user_id' in data:
+        return jsonify({"error": "Missing data"}), 400
 
-usuario_schema = UsuarioSchema()
+    anamnesis_data = {
+        "user_id": data['user_id'],
+        "medical_history": data.get('medical_history'),
+        "allergies": data.get('allergies'),
+        "medications": data.get('medications')
+    }
 
-# Criar usuário
-@api_blueprint.route('/api/usuarios', methods=['POST'])
-def create_usuario():
-    data = request.get_json()
-    errors = usuario_schema.validate(data)
-    if errors:
-        return jsonify(errors), 400
+    mongo.db.anamnesis.insert_one(anamnesis_data)
+    return jsonify({"msg": "Anamnesis record created"}), 201
 
-    novo_usuario = Usuario(**data)
-    result = mongo.db.usuarios.insert_one(novo_usuario.__dict__)
-    novo_usuario.__dict__["_id"] = str(result.inserted_id)
+@app.route('/api/anamnesis/<user_id>', methods=['GET'])
+def get_anamnesis(user_id):
+    anamnesis_record = mongo.db.anamnesis.find_one({"user_id": user_id})
+    if not anamnesis_record:
+        return jsonify({"error": "No record found"}), 404
 
-    return jsonify(novo_usuario.__dict__), 201
+    return jsonify(anamnesis_record), 200
 
-# Listar usuários
-@api_blueprint.route('/api/usuarios', methods=['GET'])
-def get_usuarios():
-    usuarios = mongo.db.usuarios.find()
-    return jsonify([Usuario.to_json(usuario) for usuario in usuarios]), 200
-
-# Buscar um usuário
-@api_blueprint.route('/api/usuarios/<id>', methods=['GET'])
-def get_usuario(id):
-    usuario = mongo.db.usuarios.find_one({"_id": ObjectId(id)})
-    if not usuario:
-        return jsonify({"error": "Usuário não encontrado"}), 404
-
-    return jsonify(Usuario.to_json(usuario)), 200
-
-# Atualizar usuário
-@api_blueprint.route('/api/usuarios/<id>', methods=['PUT'])
-def update_usuario(id):
-    data = request.get_json()
-    errors = usuario_schema.validate(data)
-    if errors:
-        return jsonify(errors), 400
-
-    result = mongo.db.usuarios.update_one({"_id": ObjectId(id)}, {"$set": data})
-    
-    if result.matched_count == 0:
-        return jsonify({"error": "Usuário não encontrado"}), 404
-
-    return jsonify({"message": "Usuário atualizado com sucesso"}), 200
-
-# Deletar usuário
-@api_blueprint.route('/api/usuarios/<id>', methods=['DELETE'])
-def delete_usuario(id):
-    result = mongo.db.usuarios.delete_one({"_id": ObjectId(id)})
-
+@app.route('/api/anamnesis/<user_id>', methods=['DELETE'])
+def delete_anamnesis(user_id):
+    result = mongo.db.anamnesis.delete_one({"user_id": user_id})
     if result.deleted_count == 0:
-        return jsonify({"error": "Usuário não encontrado"}), 404
+        return jsonify({"error": "No record found to delete"}), 404
 
-    return jsonify({"message": "Usuário deletado com sucesso"}), 200
+    return jsonify({"msg": "Anamnesis record deleted"}), 200
