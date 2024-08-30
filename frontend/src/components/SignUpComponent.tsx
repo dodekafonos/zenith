@@ -1,3 +1,4 @@
+// SignUpComponent.tsx
 import { 
   Heading, 
   Text, 
@@ -17,6 +18,7 @@ import {
   ModalFooter 
 } from '@chakra-ui/react';
 import { useState } from 'react';
+import axios from 'axios';
 
 interface SignUpComponentProps {
   setShowSignUp: (show: boolean) => void;
@@ -24,7 +26,11 @@ interface SignUpComponentProps {
 
 function SignUpComponent({ setShowSignUp }: SignUpComponentProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
   const [isChecked, setIsChecked] = useState(false);
+  const [error, setError] = useState('');
 
   const handleCheckboxChange = () => {
     if (isChecked) {
@@ -44,17 +50,45 @@ function SignUpComponent({ setShowSignUp }: SignUpComponentProps) {
     onClose(); // Fecha o modal ao recusar os termos
   };
 
+  const handleSignUp = async () => {
+    try {
+      await axios.post('http://localhost:5000/users/register', {
+        name,
+        email,
+        password
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      // Limpar os campos de entrada
+      setName('');
+      setEmail('');
+      setPassword('');
+      // Alternar para a página de login
+      setShowSignUp(false);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error('Axios error:', error.response?.data);
+        setError('Erro ao registrar usuário.');
+      } else {
+        console.error('Unexpected error:', error);
+        setError('Erro ao conectar ao servidor.');
+      }
+    }
+  };
+
   return (
     <Box 
       w='100%' 
       maxW='400px'
-      p={8}
+      p={6}
       bg='white'
       borderRadius='md'
       boxShadow='lg'
       display='flex' 
       flexDir='column' 
-      gap={5}
+      gap={2}
       border='2px'
       borderColor='green.700'
     >
@@ -62,12 +96,25 @@ function SignUpComponent({ setShowSignUp }: SignUpComponentProps) {
         Sign Up
       </Heading>
       <FormControl>
+        <FormLabel color='green.700' fontWeight='bold'>Name</FormLabel>
+        <Input 
+          type='text' 
+          placeholder='Enter your name'
+          focusBorderColor='green.700'
+          bg='gray.50'
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+      </FormControl>
+      <FormControl>
         <FormLabel color='green.700' fontWeight='bold'>Email</FormLabel>
         <Input 
           type='text' 
           placeholder='Enter your email'
           focusBorderColor='green.700'
           bg='gray.50'
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
       </FormControl>
       <FormControl>
@@ -77,10 +124,12 @@ function SignUpComponent({ setShowSignUp }: SignUpComponentProps) {
           placeholder='Enter your password'
           focusBorderColor='green.700'
           bg='gray.50'
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
       </FormControl>
+      {error && <Text color='red.500' textAlign='center'>{error}</Text>}
       
-      {/* Checkbox de Termos e Condições */}
       <Checkbox 
         isChecked={isChecked} 
         onChange={handleCheckboxChange} 
@@ -94,10 +143,10 @@ function SignUpComponent({ setShowSignUp }: SignUpComponentProps) {
         color='white' 
         _hover={{ bg: 'green.800' }} 
         w='100%'
-        mt={1}
         fontFamily='Arial, sans-serif'
         fontWeight='bold'
         isDisabled={!isChecked} // Desabilita o botão se os termos não forem aceitos
+        onClick={handleSignUp}
       >
         Sign Up
       </Button>
@@ -106,7 +155,6 @@ function SignUpComponent({ setShowSignUp }: SignUpComponentProps) {
         Already have an account? <Text as='span' cursor='pointer' color='green.700' fontWeight='bold' onClick={() => setShowSignUp(false)}>Login</Text>
       </Text>
 
-      {/* Modal de Termos e Condições */}
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
@@ -117,11 +165,11 @@ function SignUpComponent({ setShowSignUp }: SignUpComponentProps) {
               Aqui você pode colocar os termos e condições completos que o usuário precisa aceitar para continuar com o cadastro.
             </Text>
           </ModalBody>
-          <ModalFooter>
+          <ModalFooter gap={2}>
             <Button colorScheme='green' onClick={handleAccept}>
               Aceitar
             </Button>
-            <Button variant='ghost' onClick={handleDecline}>
+            <Button variant='ghost' bgColor='darkgray' onClick={handleDecline}>
               Recusar
             </Button>
           </ModalFooter>

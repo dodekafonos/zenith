@@ -1,16 +1,31 @@
+// LoginComponent.tsx
 import { Heading, Text, Box, Button, Input, FormControl, FormLabel } from '@chakra-ui/react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 interface LoginComponentProps {
   setShowSignUp: (show: boolean) => void;
 }
 
 function LoginComponent({ setShowSignUp }: LoginComponentProps) {
-  const navigate = useNavigate()
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const handleOpen = () => {
-    navigate('/home')
-  }
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post('http://localhost:5000/users/login', { email, password });
+      const { access_token } = response.data;
+      localStorage.setItem('token', access_token);
+      navigate('/home');
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      setError('Credenciais inválidas. Tente novamente.');
+    }
+  };
+  
   return (
     <Box 
       w='100%' 
@@ -35,6 +50,8 @@ function LoginComponent({ setShowSignUp }: LoginComponentProps) {
           placeholder='Enter your email'
           focusBorderColor='green.700'
           bg='gray.50'
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
       </FormControl>
       <FormControl>
@@ -44,8 +61,11 @@ function LoginComponent({ setShowSignUp }: LoginComponentProps) {
           placeholder='Enter your password'
           focusBorderColor='green.700'
           bg='gray.50'
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
       </FormControl>
+      {error && <Text color='red.500' textAlign='center'>{error}</Text>}
       <Button 
         bg='green.900' 
         color='white' 
@@ -54,7 +74,7 @@ function LoginComponent({ setShowSignUp }: LoginComponentProps) {
         mt={4}
         fontFamily='Arial, sans-serif'
         fontWeight='bold'
-        onClick={handleOpen}
+        onClick={handleLogin}
       >
         Login
       </Button>

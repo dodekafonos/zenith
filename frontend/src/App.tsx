@@ -1,19 +1,26 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Box} from '@chakra-ui/react';
-import HomePage from './pages/HomePage';
-import AboutPage from './pages/AboutPage';
+// App.tsx ou Routes.tsx
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'; // Adiciona o import de Navigate
+import LoginComponent from './components/LoginComponent';
+import SignUpComponent from './components/SignUpComponent';
+import Home from './pages/HomePage';
+import ProtectedRoute from './components/PrivateRoutes';
+import { useState } from 'react'; // Adiciona o import de useState
 import LoginPage from './pages/LoginPage';
 
 function App() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [showSignUp, setShowSignUp] = useState(false);
+
   return (
     <Router>
-      <Box>
-        <Routes>
-          <Route path="/home" element={<HomePage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/" element={<LoginPage />} />
-          </Routes>
-      </Box>
+      <Routes>
+        <Route path="/login" element={<LoginComponent setShowSignUp={setShowSignUp} />} />
+        <Route path="/signup" element={<SignUpComponent setShowSignUp={setShowSignUp} />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/home" element={<Home />} />
+        </Route>
+        <Route path="/" element={<LoginPage/>} />
+      </Routes>
     </Router>
   );
 }
