@@ -15,7 +15,8 @@ import {
   ModalHeader, 
   ModalBody, 
   ModalCloseButton, 
-  ModalFooter 
+  ModalFooter,
+  useToast
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import axios from 'axios';
@@ -31,6 +32,7 @@ function SignUpComponent({ setShowSignUp }: SignUpComponentProps) {
   const [name, setName] = useState('');
   const [isChecked, setIsChecked] = useState(false);
   const [error, setError] = useState('');
+  const toast = useToast()
 
   const handleCheckboxChange = () => {
     if (isChecked) {
@@ -60,6 +62,12 @@ function SignUpComponent({ setShowSignUp }: SignUpComponentProps) {
         headers: {
           'Content-Type': 'application/json'
         }
+      });
+      toast({
+        title: "Cadastro bem-sucedido",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
       });
       // Limpar os campos de entrada
       setName('');

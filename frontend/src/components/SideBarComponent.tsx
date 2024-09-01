@@ -10,6 +10,11 @@ interface SideBarProps {
 function SideBarComponent({ onSelect }: SideBarProps) {
   const navigate = useNavigate();
 
+  const handleLogout = () =>{
+    localStorage.removeItem('token');
+    navigate('/');
+  }
+
   return (
     <Box 
       w='100px' 
@@ -93,7 +98,7 @@ function SideBarComponent({ onSelect }: SideBarProps) {
           color='white'
           bgColor='green.600'
           _hover={{ bg: 'red.500' }}
-          onClick={() => navigate('/')}
+          onClick={handleLogout}
           size="lg"
           mt={4}
         />

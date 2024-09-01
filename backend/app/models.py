@@ -26,13 +26,9 @@ class User:
         mongo.db.users.insert_one(user.to_dict())
 
 
-class Item:
-    def __init__(self, name, description):
-        self.name = name
-        self.description = description
-
-    def to_dict(self):
-        return {
-            "name": self.name,
-            "description": self.description
-        }
+from mongoengine import Document, fields
+class Anamnese(Document):
+    user_id = fields.ObjectIdField(required=True)
+    historico_medico = fields.StringField()
+    alergias = fields.StringField()
+    medicamentos = fields.StringField()

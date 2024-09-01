@@ -1,5 +1,5 @@
 // LoginComponent.tsx
-import { Heading, Text, Box, Button, Input, FormControl, FormLabel } from '@chakra-ui/react';
+import { Heading, Text, Box, Button, Input, FormControl, FormLabel, useToast } from '@chakra-ui/react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -13,15 +13,28 @@ function LoginComponent({ setShowSignUp }: LoginComponentProps) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const toast = useToast()
 
   const handleLogin = async () => {
     try {
       const response = await axios.post('http://localhost:5000/users/login', { email, password });
       const { access_token } = response.data;
+      toast({
+        title: "Login bem-sucedido",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
       localStorage.setItem('token', access_token);
       navigate('/home');
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
+      toast({
+        title: "Erro no login",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
       setError('Credenciais inválidas. Tente novamente.');
     }
   };
