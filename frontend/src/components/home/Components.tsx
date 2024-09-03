@@ -16,13 +16,13 @@ import {
   FormLabel,
   Textarea,
   Input, 
-  Image,
   SimpleGrid,
   useToast,
 } from '@chakra-ui/react'
 import HomeCarousel from './HomeCarousel';
 import { useEffect, useState } from 'react';
 import ReactApexChart from 'react-apexcharts';
+import HealthRecommendations from './RecomendationsComponent';
 
 export function HomeComponent() {
   return (
@@ -37,10 +37,7 @@ export function HomeComponent() {
 export function UserComponent() {
   return (
     <Box p={6}>
-      <Heading>Usuário</Heading>
-      <Box mb={5}>
-        <Image alt="Health Logo" boxSize="50px" />
-      </Box>    
+        <HealthRecommendations/>
     </Box>
   );
 }
@@ -79,9 +76,8 @@ export function StatisticsComponent() {
     fetchAnamnesisData();
   }, []);
 
-  // Configurações do gráfico
   const chartOptions = {
-    series: anamnesisList.map(() => Math.random() * 100), // Simula dados aleatórios para demonstração
+    series: anamnesisList.map(() => Math.random() * 100), 
     options: {
       chart: {
         type: 'polarArea',
@@ -89,7 +85,7 @@ export function StatisticsComponent() {
       labels: anamnesisList.map((anamnese) => anamnese.historico_medico || 'N/A'),
       fill: {
         opacity: 1,
-        colors: ['#006400', '#008000', '#32CD32', '#7CFC00', '#ADFF2F'], // Escala de verdes
+        colors: ['#006400', '#008000', '#32CD32', '#7CFC00', '#ADFF2F'], 
       },
       stroke: {
         width: 1,
@@ -145,6 +141,7 @@ export function DataComponent() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isDataModalOpen, setIsDataModalOpen] = useState(false);
   const [selectedAnamnesis, setSelectedAnamnesis] = useState<Anamnese | null>(null);
+  const toast = useToast();
 
   useEffect(() => {
     const fetchAnamnesisData = async () => {
@@ -201,7 +198,13 @@ export function DataComponent() {
         throw new Error(`Failed to delete anamnese: ${response.statusText}`);
       }
 
-      setAnamnesisList((prevList) => prevList.filter((anamnese) => anamnese._id !== id));
+      setAnamnesisList((prevList) => prevList.filter((anamnese) => anamnese.id !== id));
+      toast({
+        title: "Deletada de todos os registros",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
     } catch (error) {
       console.error('Error deleting anamnese:', error);
     }
@@ -255,7 +258,6 @@ export function DataComponent() {
         Uso dos Dados
       </Button>
 
-      {/* Modal para visualizar os dados completos da anamnese */}
       <Modal isOpen={isDataModalOpen} onClose={closeModal}>
         <ModalOverlay />
         <ModalContent>
@@ -285,7 +287,6 @@ export function DataComponent() {
         </ModalContent>
       </Modal>
 
-      {/* Modal sobre o uso dos dados */}
       <Modal onClose={onClose} isOpen={isOpen}>
         <ModalOverlay />
         <ModalContent>
@@ -293,10 +294,7 @@ export function DataComponent() {
           <ModalCloseButton />
           <ModalBody>
             <Box>
-              Este modal fornece informações sobre como seus dados são utilizados e a política de exclusão total. Seus
-              dados de anamnese são armazenados de forma segura e são acessíveis somente por você. Se desejar excluir
-              seus dados, eles serão removidos de todos os registros e backups, garantindo a exclusão total e
-              irreversível.
+            "De acordo com o Artigo 18, Inciso VI da Lei nº 13.709/2018 (Lei Geral de Proteção de Dados Pessoais - LGPD), você tem o direito de solicitar a exclusão de seus dados pessoais armazenados em nossos sistemas. Ao exercer esse direito, todos os seus dados de anamnese serão eliminados de nossos registros, bases de dados e quaisquer backups, garantindo a exclusão total e irreversível, salvo nos casos previstos pela lei onde a retenção seja necessária."
             </Box>
           </ModalBody>
           <ModalFooter>
@@ -348,7 +346,6 @@ export function AnamnesisFormComponent() {
       if (response.ok) {
         const result = await response.json();
         console.log('Anamnese criada com sucesso:', result);
-        // Resetar os campos após o sucesso
         setHistoricoMedico('');
         setAlergias('');
         setMedicamentos('');

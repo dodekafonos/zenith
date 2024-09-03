@@ -47,7 +47,6 @@ function LoginPage() {
           position="relative" 
         />
         
-        {/* Controla a renderização inicial do componente de Login ou Signup */}
         {showSignUp ? <SignUpComponent setShowSignUp={setShowSignUp} /> : <LoginComponent setShowSignUp={setShowSignUp} />}
       </Box>
     </Box>

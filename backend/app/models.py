@@ -1,5 +1,6 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import mongo
+from mongoengine import Document, fields
 
 class User:
     def __init__(self, email, password=None, hashed_password=None):
@@ -25,8 +26,6 @@ class User:
         user = User( email, password)
         mongo.db.users.insert_one(user.to_dict())
 
-
-from mongoengine import Document, fields
 class Anamnese(Document):
     user_id = fields.ObjectIdField(required=True)
     historico_medico = fields.StringField()

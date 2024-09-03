@@ -1,5 +1,5 @@
 import { Box, IconButton, VStack, Image, Tooltip } from '@chakra-ui/react';
-import { FaHome, FaUser, FaChartBar, FaDatabase, FaSignOutAlt, FaFileMedical } from 'react-icons/fa';
+import { FaHome, FaChartBar, FaDatabase, FaSignOutAlt, FaFileMedical, FaSearch } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/health2-removebg.png';
 
@@ -16,8 +16,8 @@ function SideBarComponent({ onSelect }: SideBarProps) {
   }
 
   return (
-    <Box 
-      w='100px' 
+    <Box  
+      w='8%' 
       h='100vh' 
       bgColor='green.900' 
       display='flex' 
@@ -78,10 +78,10 @@ function SideBarComponent({ onSelect }: SideBarProps) {
             size="lg"
           />
         </Tooltip>
-        <Tooltip label="User" fontSize="md">
+        <Tooltip label="Solutions" fontSize="md">
           <IconButton 
-            icon={<FaUser size="28px" />} 
-            aria-label="User" 
+            icon={<FaSearch size="28px" />} 
+            aria-label="Solution" 
             color='white'
             bgColor='green.900'
             _hover={{ bg: 'green.700' }}

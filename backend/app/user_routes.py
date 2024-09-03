@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from werkzeug.security import generate_password_hash, check_password_hash  # Adiciona a importação de generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash  
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from . import mongo
 
@@ -17,7 +17,7 @@ def register():
         email = data['email']
         password = data['password']
         
-        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')  # Gera o hash da senha
+        hashed_password = generate_password_hash(password, method='pbkdf2:sha256') 
         
         if mongo.db.users.find_one({"email": email}):
             return jsonify({"message": "Email já cadastrado"}), 400
@@ -31,6 +31,8 @@ def register():
         return jsonify({"message": "Usuário registrado com sucesso"}), 201
     except Exception as e:
         return jsonify({"message": str(e)}), 500
+    
+
 
 @bp.route('/login', methods=['POST'])
 def login():
@@ -51,6 +53,8 @@ def login():
             return jsonify({"message": "Email ou senha inválidos"}), 401
     except Exception as e:
         return jsonify({"message": str(e)}), 500
+    
+
 
 @bp.route('/home', methods=['GET'])
 @jwt_required()

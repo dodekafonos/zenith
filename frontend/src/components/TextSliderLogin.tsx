@@ -33,7 +33,7 @@ function TextSlider() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prevSlide) => (prevSlide + 1) % slides.length);
-    }, 10000); // change slide every 8 seconds
+    }, 10000); 
 
     return () => clearInterval(interval);
   }, []);

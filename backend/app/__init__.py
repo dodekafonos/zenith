@@ -15,8 +15,7 @@ def create_app():
     CORS(app, resources={r"/*": {"origins": ["http://localhost:5173"]}}, supports_credentials=True)
 
     app.config["MONGO_URI"] = os.getenv("MONGO_URI")
-    app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")  # Adicione uma chave secreta para JWT
-
+    app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY") 
     mongo.init_app(app)
     jwt.init_app(app)
 

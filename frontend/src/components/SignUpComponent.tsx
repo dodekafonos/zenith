@@ -1,4 +1,3 @@
-// SignUpComponent.tsx
 import { 
   Heading, 
   Text, 
@@ -38,18 +37,18 @@ function SignUpComponent({ setShowSignUp }: SignUpComponentProps) {
     if (isChecked) {
       setIsChecked(false);
     } else {
-      onOpen(); // Abre o modal se o usuário tentar marcar o checkbox
+      onOpen(); 
     }
   };
 
   const handleAccept = () => {
     setIsChecked(true);
-    onClose(); // Fecha o modal após aceitar os termos
+    onClose(); 
   };
 
   const handleDecline = () => {
     setIsChecked(false);
-    onClose(); // Fecha o modal ao recusar os termos
+    onClose(); 
   };
 
   const handleSignUp = async () => {
@@ -69,11 +68,11 @@ function SignUpComponent({ setShowSignUp }: SignUpComponentProps) {
         duration: 3000,
         isClosable: true,
       });
-      // Limpar os campos de entrada
+     
       setName('');
       setEmail('');
       setPassword('');
-      // Alternar para a página de login
+      
       setShowSignUp(false);
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -153,7 +152,7 @@ function SignUpComponent({ setShowSignUp }: SignUpComponentProps) {
         w='100%'
         fontFamily='Arial, sans-serif'
         fontWeight='bold'
-        isDisabled={!isChecked} // Desabilita o botão se os termos não forem aceitos
+        isDisabled={!isChecked} 
         onClick={handleSignUp}
       >
         Sign Up
@@ -164,25 +163,49 @@ function SignUpComponent({ setShowSignUp }: SignUpComponentProps) {
       </Text>
 
       <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Termos e Condições</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Text>
-              Aqui você pode colocar os termos e condições completos que o usuário precisa aceitar para continuar com o cadastro.
-            </Text>
-          </ModalBody>
-          <ModalFooter gap={2}>
-            <Button colorScheme='green' onClick={handleAccept}>
-              Aceitar
-            </Button>
-            <Button variant='ghost' bgColor='darkgray' onClick={handleDecline}>
-              Recusar
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+  <ModalOverlay />
+  <ModalContent>
+    <ModalHeader>Termos e Condições</ModalHeader>
+    <ModalCloseButton />
+    <ModalBody overflowY="auto" maxHeight="400px">
+      <Text>
+        Termos e Condições
+
+        1. Aceitação dos Termos
+        Ao utilizar nossos serviços, você concorda com os seguintes termos e condições. Por favor, leia-os com atenção. Se você não concordar com estes termos, não deverá utilizar os nossos serviços.
+
+        2. Coleta e Uso de Dados
+        Nós coletamos e armazenamos os dados fornecidos por você para fins exclusivos de armazenamento e análise interna. Seus dados de anamnese serão utilizados para gerar insights e recomendações personalizadas, com o único objetivo de melhorar sua experiência e proporcionar um melhor entendimento de sua saúde.
+
+        3. Proteção de Dados Pessoais
+        Estamos comprometidos em proteger a privacidade e segurança de seus dados pessoais. Seguimos as diretrizes da Lei Geral de Proteção de Dados Pessoais (LGPD - Lei nº 13.709/2018), garantindo que seus dados sejam tratados de forma segura e confidencial.
+
+        4. Compartilhamento de Dados
+        Seus dados não serão compartilhados com terceiros, exceto quando estritamente necessário para o cumprimento de obrigações legais, como em casos de solicitações judiciais.
+
+        5. Exclusão de Dados
+        Você tem o direito de solicitar a exclusão de seus dados a qualquer momento. Conforme descrito na nossa política de privacidade, ao solicitar a exclusão, seus dados serão removidos de todos os nossos registros e backups, garantindo a exclusão total e irreversível, salvo nos casos em que a retenção seja exigida por lei.
+
+        6. Alterações nos Termos e Condições
+        Reservamo-nos o direito de alterar estes termos e condições a qualquer momento. Qualquer alteração será comunicada a você antes de entrar em vigor. O uso continuado dos nossos serviços após a notificação de alterações constitui sua aceitação dos novos termos.
+
+        7. Limitação de Responsabilidade
+        Nosso serviço é fornecido "como está" e "conforme disponível". Não garantimos que o serviço estará disponível de forma ininterrupta ou livre de erros. Na medida permitida por lei, não seremos responsáveis por quaisquer danos diretos, indiretos, incidentais, ou consequenciais resultantes do uso ou da incapacidade de usar o serviço.
+
+        8. Contato
+        Se você tiver alguma dúvida sobre estes termos, entre em contato conosco através do suporte ao cliente.
+      </Text>
+    </ModalBody>
+    <ModalFooter gap={2}>
+      <Button colorScheme="green" onClick={handleAccept}>
+        Aceitar
+      </Button>
+      <Button variant="ghost" bgColor="darkgray" onClick={handleDecline}>
+        Recusar
+      </Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>
     </Box>
   );
 }

@@ -25,11 +25,8 @@ function HomePage() {
 
   return (
     <Box display="flex">
-      {/* Sidebar fixa à esquerda */}
       <SideBarComponent onSelect={setSelectedComponent} />
-
-      {/* Conteúdo à direita da sidebar */}
-      <Box flex="1" ml="7%" p={4} bgColor="gray.50" h="100vh" overflowY="auto">
+      <Box flex="1" ml="8%" p={4} bgColor="gray.50" h="100vh" overflowY="auto">
         {renderSelectedComponent()}
       </Box>
     </Box>
