@@ -31,3 +31,4 @@ class Anamnese(Document):
     historico_medico = fields.StringField()
     alergias = fields.StringField()
     medicamentos = fields.StringField()
+    role = fields.StringFields()

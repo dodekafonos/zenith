@@ -12,21 +12,41 @@ function LoginComponent({ setShowSignUp }: LoginComponentProps) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const toast = useToast()
+  const toast = useToast();
 
   const handleLogin = async () => {
     try {
       const response = await axios.post('http://localhost:5000/users/login', { email, password });
+  
+      // Exibir a resposta da API para depuração
+      console.log('Resposta da API:', response.data);
+  
       const { access_token } = response.data;
+      if (!access_token) {
+        throw new Error('Token não encontrado na resposta');
+      }
+  
+      // Decodifique o token JWT para acessar a role
+      const decodedToken = JSON.parse(atob(access_token.split('.')[1]));
+      console.log('Token Decodificado:', decodedToken);
+  
+      // Extraia a role corretamente
+      const { role } = decodedToken.sub; // Role está dentro de decodedToken.sub
+  
+      if (!role) {
+        throw new Error('Role não encontrada no token');
+      }
+  
       toast({
         title: "Login bem-sucedido",
         status: "success",
         duration: 3000,
         isClosable: true,
       });
+  
       localStorage.setItem('token', access_token);
-      navigate('/home');
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      localStorage.setItem('role', role); // Salvando a role no localStorage
+      navigate(role === 'admin' ? '/admin' : '/home'); // Navegar para a rota apropriada
     } catch (err) {
       toast({
         title: "Erro no login",
@@ -35,8 +55,10 @@ function LoginComponent({ setShowSignUp }: LoginComponentProps) {
         isClosable: true,
       });
       setError('Credenciais inválidas. Tente novamente.');
+      console.error('Erro durante o login:', err);
     }
   };
+  
   
   return (
     <Box 
@@ -55,29 +77,33 @@ function LoginComponent({ setShowSignUp }: LoginComponentProps) {
       <Heading size='lg' color='green.900' fontFamily='Arial, sans-serif' textAlign='center'>
         Login
       </Heading>
+      
       <FormControl>
         <FormLabel color='green.700' fontWeight='bold'>Email</FormLabel>
         <Input 
-          type='text' 
-          placeholder='Enter your email'
+          type='email' 
+          placeholder='Digite seu email'
           focusBorderColor='green.700'
           bg='gray.50'
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
       </FormControl>
+      
       <FormControl>
-        <FormLabel color='green.700' fontWeight='bold'>Password</FormLabel>
+        <FormLabel color='green.700' fontWeight='bold'>Senha</FormLabel>
         <Input 
           type='password' 
-          placeholder='Enter your password'
+          placeholder='Digite sua senha'
           focusBorderColor='green.700'
           bg='gray.50'
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
       </FormControl>
+      
       {error && <Text color='red.500' textAlign='center'>{error}</Text>}
+      
       <Button 
         bg='green.900' 
         color='white' 
@@ -90,8 +116,9 @@ function LoginComponent({ setShowSignUp }: LoginComponentProps) {
       >
         Login
       </Button>
+      
       <Text textAlign='center' color='green.700'>
-        Don't have an account? <Text as='span' cursor='pointer' color='green.700' fontWeight='bold' onClick={() => setShowSignUp(true)}>Sign Up</Text>
+        Não tem uma conta? <Text as='span' cursor='pointer' color='green.700' fontWeight='bold' onClick={() => setShowSignUp(true)}>Cadastre-se</Text>
       </Text>
     </Box>
   );

@@ -12,6 +12,7 @@ function SideBarComponent({ onSelect }: SideBarProps) {
 
   const handleLogout = () =>{
     localStorage.removeItem('token');
+    localStorage.removeItem('role');
     navigate('/');
   }
 
@@ -85,7 +86,7 @@ function SideBarComponent({ onSelect }: SideBarProps) {
             color='white'
             bgColor='green.900'
             _hover={{ bg: 'green.700' }}
-            onClick={() => onSelect('user')}
+            onClick={() => onSelect('recomendation')}
             size="lg"
           />
         </Tooltip>

@@ -6,6 +6,7 @@ import Home from './pages/HomePage';
 import ProtectedRoute from './components/PrivateRoutes';
 import { useState } from 'react'; // Adiciona o import de useState
 import LoginPage from './pages/LoginPage';
+import { AdminComponent } from './components/home/AdminComponent';
 
 function App() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -18,6 +19,7 @@ function App() {
         <Route path="/signup" element={<SignUpComponent setShowSignUp={setShowSignUp} />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/home" element={<Home />} />
+          <Route path="/admin" element={<AdminComponent/>}/>
         </Route>
         <Route path="/" element={<LoginPage/>} />
       </Routes>

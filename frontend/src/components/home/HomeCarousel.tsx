@@ -1,9 +1,13 @@
 import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
+import anamneseImage from '../../assets/anamiseseCarrossel.png';
+import dadosImage from '../../assets/DadosCarrossel.png';
+import estatisticasImage from '../../assets/EstatisticasCarrossel.png';
+import solucoesImage from '../../assets/SolucoesCarrossel.png';
 
 function SmallHomeCarousel() {
   return (
-    <div style={{width: '80%', margin: '0 auto' }}>
+    <div style={{ width: '70%', margin: '0 auto' }}>
       <Carousel 
         showArrows={true} 
         showThumbs={false} 
@@ -14,20 +18,16 @@ function SmallHomeCarousel() {
         dynamicHeight={true}
       >
         <div>
-          <img src="https://via.placeholder.com/400x200?text=Imagem+1" alt="Imagem 1" />
-          <p className="legend">Legenda da Imagem 1</p>
+          <img src={anamneseImage} alt="Anamnese Image" />
         </div>
         <div>
-          <img src="https://via.placeholder.com/400x200?text=Imagem+2" alt="Imagem 2" />
-          <p className="legend">Legenda da Imagem 2</p>
+          <img src={dadosImage} alt="Imagem 2" />
         </div>
         <div>
-          <img src="https://via.placeholder.com/400x200?text=Imagem+3" alt="Imagem 3" />
-          <p className="legend">Legenda da Imagem 3</p>
+          <img src={estatisticasImage} alt="Imagem 3" />
         </div>
         <div>
-          <img src="https://via.placeholder.com/400x200?text=Imagem+4" alt="Imagem 4" />
-          <p className="legend">Legenda da Imagem 4</p>
+          <img src={solucoesImage} alt="Imagem 4" />
         </div>
       </Carousel>
     </div>
