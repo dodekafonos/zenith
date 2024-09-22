@@ -1,6 +1,10 @@
+# models.py
 from werkzeug.security import generate_password_hash, check_password_hash
-from . import mongo
-from mongoengine import Document, fields
+from flask_pymongo import PyMongo
+from bson import ObjectId
+import datetime
+
+mongo = PyMongo()
 
 class User:
     def __init__(self, email, password=None, hashed_password=None):
@@ -22,13 +26,38 @@ class User:
         return check_password_hash(stored_password, provided_password)
 
     @staticmethod
-    def create_user( email, password):
-        user = User( email, password)
+    def create_user(email, password):
+        user = User(email, password)
         mongo.db.users.insert_one(user.to_dict())
 
-class Anamnese(Document):
-    user_id = fields.ObjectIdField(required=True)
-    historico_medico = fields.StringField()
-    alergias = fields.StringField()
-    medicamentos = fields.StringField()
-    role = fields.StringFields()
+class Term:
+    @staticmethod
+    def create_term(data):
+        """Cria um novo termo e retorna o ID do termo inserido."""
+        term_id = mongo.db.terms_and_conditions.insert_one(data).inserted_id
+        return term_id
+
+    @staticmethod
+    def get_term_by_id(term_id):
+        """Obtém um termo pelo seu ID."""
+        return mongo.db.terms_and_conditions.find_one({"_id": ObjectId(term_id)})
+
+    @staticmethod
+    def delete_term(term_id):
+        """Deleta um termo pelo seu ID e retorna o número de documentos excluídos."""
+        result = mongo.db.terms_and_conditions.delete_one({"_id": ObjectId(term_id)})
+        return result.deleted_count
+
+    @staticmethod
+    def get_all_terms():
+        """Obtém todos os termos e condições."""
+        all_terms = mongo.db.terms_and_conditions.find()
+        terms_list = []
+        for term in all_terms:
+            terms_list.append({
+                'id': str(term['_id']),
+                'title': term.get('title', ''),
+                'content': term.get('content', ''),
+                'created_at': term.get('created_at', '')
+            })
+        return terms_list

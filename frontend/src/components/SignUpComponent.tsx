@@ -15,10 +15,16 @@ import {
   ModalBody, 
   ModalCloseButton, 
   ModalFooter,
-  useToast
+  useToast,
+  VStack
 } from '@chakra-ui/react';
-import { useState } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from 'react';
+
+interface Term {
+  id: string;
+  content: string; // Conteúdo do termo
+  isRequired: boolean; // Se o termo é obrigatório
+}
 
 interface SignUpComponentProps {
   setShowSignUp: (show: boolean) => void;
@@ -31,7 +37,41 @@ function SignUpComponent({ setShowSignUp }: SignUpComponentProps) {
   const [name, setName] = useState('');
   const [isChecked, setIsChecked] = useState(false);
   const [error, setError] = useState('');
-  const toast = useToast()
+  const [terms, setTerms] = useState<Term[]>([]); // Estado que guarda os termos
+  const [acceptedTerms, setAcceptedTerms] = useState<string[]>([]);
+  const toast = useToast();
+
+  // Buscar termos do backend ao carregar o componente
+  useEffect(() => {
+    const fetchTerms = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/terms', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(`Erro ao buscar termos: ${errorData.error || response.statusText}`);
+        }
+
+        const data: Term[] = await response.json(); // Recebendo dados como array de termos
+        setTerms(data); // Atualizando estado com os termos recebidos
+      } catch (error) {
+        console.error("Erro ao buscar termos", error);
+        toast({
+          title: "Erro ao buscar termos.",
+          description: (error as Error).message || "Erro interno",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    };
+    fetchTerms();
+  }, [toast]);
 
   const handleCheckboxChange = () => {
     if (isChecked) {
@@ -42,47 +82,68 @@ function SignUpComponent({ setShowSignUp }: SignUpComponentProps) {
   };
 
   const handleAccept = () => {
+    const requiredTerms = terms.filter(term => term.isRequired);
+    const requiredAccepted = requiredTerms.every(term => acceptedTerms.includes(term.id));
+
+    if (!requiredAccepted) {
+      setError("Você deve aceitar os termos obrigatórios.");
+      return;
+    }
+
     setIsChecked(true);
     onClose(); 
   };
 
-  const handleDecline = () => {
-    setIsChecked(false);
-    onClose(); 
+  const handleTermCheck = (termId: string) => {
+    if (acceptedTerms.includes(termId)) {
+      setAcceptedTerms(acceptedTerms.filter(id => id !== termId));
+    } else {
+      setAcceptedTerms([...acceptedTerms, termId]);
+    }
   };
 
   const handleSignUp = async () => {
     try {
-      await axios.post('http://localhost:5000/users/register', {
-        name,
-        email,
-        password
-      }, {
+      const response = await fetch('http://localhost:5000/users/register', {
+        method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          acceptedTerms,
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error('Erro ao registrar usuário');
+      }
+
       toast({
         title: "Cadastro bem-sucedido",
         status: "success",
         duration: 3000,
         isClosable: true,
       });
-     
+
       setName('');
       setEmail('');
       setPassword('');
+      setAcceptedTerms([]);
       
       setShowSignUp(false);
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error('Axios error:', error.response?.data);
-        setError('Erro ao registrar usuário.');
-      } else {
-        console.error('Unexpected error:', error);
-        setError('Erro ao conectar ao servidor.');
-      }
+      console.error('Erro ao registrar usuário:', error);
+      setError('Erro ao registrar usuário.');
     }
+  };
+
+  const handleDecline = () => {
+    setIsChecked(false);
+    setAcceptedTerms([]);
+    onClose();
   };
 
   return (
@@ -103,8 +164,10 @@ function SignUpComponent({ setShowSignUp }: SignUpComponentProps) {
         Sign Up
       </Heading>
       <FormControl>
-        <FormLabel color='green.700' fontWeight='bold'>Name</FormLabel>
+        <FormLabel htmlFor="name" color='green.700' fontWeight='bold'>Name</FormLabel>
         <Input 
+          id="name"
+          name="name"
           type='text' 
           placeholder='Enter your name'
           focusBorderColor='green.700'
@@ -114,9 +177,11 @@ function SignUpComponent({ setShowSignUp }: SignUpComponentProps) {
         />
       </FormControl>
       <FormControl>
-        <FormLabel color='green.700' fontWeight='bold'>Email</FormLabel>
+        <FormLabel htmlFor="email" color='green.700' fontWeight='bold'>Email</FormLabel>
         <Input 
-          type='text' 
+          id="email"
+          name="email"
+          type='email' 
           placeholder='Enter your email'
           focusBorderColor='green.700'
           bg='gray.50'
@@ -125,8 +190,10 @@ function SignUpComponent({ setShowSignUp }: SignUpComponentProps) {
         />
       </FormControl>
       <FormControl>
-        <FormLabel color='green.700' fontWeight='bold'>Password</FormLabel>
+        <FormLabel htmlFor="password" color='green.700' fontWeight='bold'>Password</FormLabel>
         <Input 
+          id="password"
+          name="password"
           type='password' 
           placeholder='Enter your password'
           focusBorderColor='green.700'
@@ -138,6 +205,7 @@ function SignUpComponent({ setShowSignUp }: SignUpComponentProps) {
       {error && <Text color='red.500' textAlign='center'>{error}</Text>}
       
       <Checkbox 
+        id="termsCheckbox"
         isChecked={isChecked} 
         onChange={handleCheckboxChange} 
         colorScheme='green'
@@ -159,53 +227,46 @@ function SignUpComponent({ setShowSignUp }: SignUpComponentProps) {
       </Button>
       
       <Text textAlign='center' color='green.700'>
-        Already have an account? <Text as='span' cursor='pointer' color='green.700' fontWeight='bold' onClick={() => setShowSignUp(false)}>Login</Text>
+        Já tem uma conta? <Text as='span' cursor='pointer' color='green.700' fontWeight='bold' onClick={() => setShowSignUp(false)}>Login</Text>
       </Text>
 
       <Modal isOpen={isOpen} onClose={onClose}>
-  <ModalOverlay />
-  <ModalContent>
-    <ModalHeader>Termos e Condições</ModalHeader>
-    <ModalCloseButton />
-    <ModalBody overflowY="auto" maxHeight="400px">
-      <Text>
-        Termos e Condições
-
-        1. Aceitação dos Termos
-        Ao utilizar nossos serviços, você concorda com os seguintes termos e condições. Por favor, leia-os com atenção. Se você não concordar com estes termos, não deverá utilizar os nossos serviços.
-
-        2. Coleta e Uso de Dados
-        Nós coletamos e armazenamos os dados fornecidos por você para fins exclusivos de armazenamento e análise interna. Seus dados de anamnese serão utilizados para gerar insights e recomendações personalizadas, com o único objetivo de melhorar sua experiência e proporcionar um melhor entendimento de sua saúde.
-
-        3. Proteção de Dados Pessoais
-        Estamos comprometidos em proteger a privacidade e segurança de seus dados pessoais. Seguimos as diretrizes da Lei Geral de Proteção de Dados Pessoais (LGPD - Lei nº 13.709/2018), garantindo que seus dados sejam tratados de forma segura e confidencial.
-
-        4. Compartilhamento de Dados
-        Seus dados não serão compartilhados com terceiros, exceto quando estritamente necessário para o cumprimento de obrigações legais, como em casos de solicitações judiciais.
-
-        5. Exclusão de Dados
-        Você tem o direito de solicitar a exclusão de seus dados a qualquer momento. Conforme descrito na nossa política de privacidade, ao solicitar a exclusão, seus dados serão removidos de todos os nossos registros e backups, garantindo a exclusão total e irreversível, salvo nos casos em que a retenção seja exigida por lei.
-
-        6. Alterações nos Termos e Condições
-        Reservamo-nos o direito de alterar estes termos e condições a qualquer momento. Qualquer alteração será comunicada a você antes de entrar em vigor. O uso continuado dos nossos serviços após a notificação de alterações constitui sua aceitação dos novos termos.
-
-        7. Limitação de Responsabilidade
-        Nosso serviço é fornecido "como está" e "conforme disponível". Não garantimos que o serviço estará disponível de forma ininterrupta ou livre de erros. Na medida permitida por lei, não seremos responsáveis por quaisquer danos diretos, indiretos, incidentais, ou consequenciais resultantes do uso ou da incapacidade de usar o serviço.
-
-        8. Contato
-        Se você tiver alguma dúvida sobre estes termos, entre em contato conosco através do suporte ao cliente.
-      </Text>
-    </ModalBody>
-    <ModalFooter gap={2}>
-      <Button colorScheme="green" onClick={handleAccept}>
-        Aceitar
-      </Button>
-      <Button variant="ghost" bgColor="darkgray" onClick={handleDecline}>
-        Recusar
-      </Button>
-    </ModalFooter>
-  </ModalContent>
-</Modal>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Termos e Condições</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody overflowY="auto" maxHeight="400px">
+            <VStack align="start">
+              {terms.length > 0 ? (
+                terms.map((term) => (
+                  <Box key={term.id}>
+                    <Checkbox
+                      id={`term_${term.id}`}
+                      isChecked={acceptedTerms.includes(term.id)}
+                      onChange={() => handleTermCheck(term.id)}
+                      isDisabled={term.isRequired && acceptedTerms.includes(term.id)}
+                      colorScheme="green"
+                    >
+                      {term.isRequired && <Text as="span" color="red.500">(Obrigatório)</Text>}
+                    </Checkbox>
+                    <Text mt={1} color="gray.700">{term.content}</Text> {/* Exibindo o conteúdo dos termos */}
+                  </Box>
+                ))
+              ) : (
+                <Text>Nenhum termo disponível.</Text>
+              )}
+            </VStack>
+          </ModalBody>
+          <ModalFooter gap={2}>
+            <Button colorScheme="green" onClick={handleAccept}>
+              Aceitar
+            </Button>
+            <Button variant="ghost" onClick={handleDecline}>
+              Recusar
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 }
