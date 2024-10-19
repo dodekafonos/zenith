@@ -26,11 +26,11 @@ def create_app():
     mongo.init_app(app)
     jwt.init_app(app)
 
-    app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # Servidor SMTP, pode ser Gmail, Outlook, etc.
-    app.config['MAIL_PORT'] = 587  # Porta do servidor SMTP
-    app.config['MAIL_USE_TLS'] = True  # Usa TLS para segurança
-    app.config['MAIL_USERNAME'] = 'seu-email@gmail.com'  # Seu e-mail
-    app.config['MAIL_PASSWORD'] = 'sua-senha-de-email'  # Sua senha de e-mail
+    app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
+    app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT'))  # Porta precisa ser int
+    app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS').lower() in ['true', '1', 't']
+    app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+    app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 
     mail.init_app(app)
 
