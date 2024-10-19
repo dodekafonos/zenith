@@ -3,26 +3,38 @@ from flask_pymongo import PyMongo
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 import os
+from flask_mail import Mail, Message
 from dotenv import load_dotenv
 
 mongo = PyMongo()
 jwt = JWTManager()
+mail = Mail()
 
 def create_app():
     load_dotenv()
 
     app = Flask(__name__)
     
-    # Configurar CORS para permitir requisições do frontend
+    # CORS configuration
     CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
 
-    # Configurações do MongoDB e JWT
+    # MongoDB and JWT configurations
     app.config["MONGO_URI"] = os.getenv("MONGO_URI")
     app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
+
+    
     mongo.init_app(app)
     jwt.init_app(app)
 
-    # Handler global para requisições OPTIONS (preflight)
+    app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # Servidor SMTP, pode ser Gmail, Outlook, etc.
+    app.config['MAIL_PORT'] = 587  # Porta do servidor SMTP
+    app.config['MAIL_USE_TLS'] = True  # Usa TLS para segurança
+    app.config['MAIL_USERNAME'] = 'seu-email@gmail.com'  # Seu e-mail
+    app.config['MAIL_PASSWORD'] = 'sua-senha-de-email'  # Sua senha de e-mail
+
+    mail.init_app(app)
+
+    # Handle preflight requests
     @app.before_request
     def handle_options_requests():
         if request.method == 'OPTIONS':
@@ -37,13 +49,15 @@ def create_app():
         from .routes import bp as anamnesis_bp
         from .user_routes import bp as user_bp
         from .terms_routes import bp as terms_bp
+        from .send_email import bp as share_bp
 
-        # Registrar blueprints com o prefixo '/api' e '/users'
         app.register_blueprint(anamnesis_bp)
         app.register_blueprint(user_bp, url_prefix='/users')
-        app.register_blueprint(terms_bp, url_prefix='/api/terms')  # Alterado para evitar conflito
-    
+        app.register_blueprint(terms_bp, url_prefix='/api/terms')
+        app.register_blueprint(share_bp, url_prefix='/api')
+
     return app
+
 
 if __name__ == '__main__':
     app = create_app()

@@ -1,5 +1,6 @@
-import { Box, Text, Heading, keyframes } from '@chakra-ui/react';
+import { Box, Text, Heading } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
+import { keyframes } from '@emotion/react';
 
 const fadeInOut = keyframes`
   0% { opacity: 0; transform: translateY(20px); }

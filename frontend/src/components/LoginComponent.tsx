@@ -17,36 +17,29 @@ function LoginComponent({ setShowSignUp }: LoginComponentProps) {
   const handleLogin = async () => {
     try {
       const response = await axios.post('http://localhost:5000/users/login', { email, password });
-  
-      // Exibir a resposta da API para depuração
       console.log('Resposta da API:', response.data);
-  
       const { access_token } = response.data;
       if (!access_token) {
         throw new Error('Token não encontrado na resposta');
       }
-  
-      // Decodifique o token JWT para acessar a role
       const decodedToken = JSON.parse(atob(access_token.split('.')[1]));
       console.log('Token Decodificado:', decodedToken);
-  
-      // Extraia a role corretamente
-      const { role } = decodedToken.sub; // Role está dentro de decodedToken.sub
-  
+      const { role } = decodedToken.sub;
+
       if (!role) {
         throw new Error('Role não encontrada no token');
       }
-  
+
       toast({
         title: "Login bem-sucedido",
         status: "success",
         duration: 3000,
         isClosable: true,
       });
-  
+
       localStorage.setItem('token', access_token);
-      localStorage.setItem('role', role); // Salvando a role no localStorage
-      navigate(role === 'admin' ? '/admin' : '/home'); // Navegar para a rota apropriada
+      localStorage.setItem('role', role);
+      navigate(role === 'admin' ? '/admin' : '/home');
     } catch (err) {
       toast({
         title: "Erro no login",
@@ -58,8 +51,7 @@ function LoginComponent({ setShowSignUp }: LoginComponentProps) {
       console.error('Erro durante o login:', err);
     }
   };
-  
-  
+
   return (
     <Box 
       w='100%' 

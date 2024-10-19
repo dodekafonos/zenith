@@ -7,6 +7,7 @@ import { AnamnesisFormComponent } from '../components/home/FormDataComponent';
 import { MainComponent } from '../components/home/Components'; // Componente principal modificado
 import { StatisticsComponent } from '../components/home/StatisticsComponent';
 import { AdminComponent } from '../components/home/AdminComponent'; // AdminComponent
+import { ProfileComponent } from '../components/home/ProfileComponent'
 
 export function HomePage() {
   const [selectedComponent, setSelectedComponent] = useState('Home');
@@ -40,6 +41,8 @@ export function HomePage() {
           return <DataComponent />;
         case 'anamnesis':
           return <AnamnesisFormComponent />;
+        case 'profile':
+          return <ProfileComponent/>;
         default:
           return <MainComponent role={role} />;
       }

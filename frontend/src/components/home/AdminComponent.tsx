@@ -29,7 +29,7 @@ import { useNavigate } from "react-router-dom";
 
 interface Term {
   id: string;
-  content: string;
+  terms: string;
   accepted_on?: string;
 }
 
@@ -70,7 +70,7 @@ export const AdminComponent = () => {
       }
 
       const data = await response.json();
-      setTermsList([...termsList, { id: data.id, content: newTerm }]);
+      setTermsList([...termsList, { id: data.id, terms: newTerm, accepted_on: "" }]);
       setNewTerm(''); // Reset the input after adding
       toast({
         title: "Termo adicionado com sucesso.",
@@ -90,40 +90,44 @@ export const AdminComponent = () => {
   };
 
   // Função para buscar todos os termos
-  const fetchTerms = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('Token não encontrado');
+  useEffect(() => {
+    const fetchTerms = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error('Token não encontrado');
+        }
+
+        const response = await fetch('http://localhost:5000/api/terms', {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include', // Inclua credenciais se necessário
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(`Failed to fetch terms: ${errorData.error || response.statusText}`);
+        }
+
+        const data = await response.json();
+        setTermsList(data);
+      } catch (error) {
+        console.error("Erro ao buscar termos:", error);
+        toast({
+          title: "Erro ao buscar termos.",
+          description: (error as Error).message || "Erro interno",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
       }
+    };
 
-      const response = await fetch('http://localhost:5000/api/terms', {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include', // Inclua credenciais se necessário
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`Failed to fetch terms: ${errorData.error || response.statusText}`);
-      }
-
-      const data = await response.json();
-      setTermsList(data);
-    } catch (error) {
-      console.error("Erro ao buscar termos:", error);
-      toast({
-        title: "Erro ao buscar termos.",
-        description: (error as Error).message || "Erro interno",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-    }
-  };
+    fetchTerms();
+  }, []);
 
   // Função para deletar um termo
   const handleDeleteTerm = async (id: string) => {
@@ -168,7 +172,7 @@ export const AdminComponent = () => {
   };
 
   const handleEditTerm = async () => {
-    if (selectedTerm && selectedTerm.content.trim() !== '') {
+    if (selectedTerm && selectedTerm.terms.trim() !== '') {
       try {
         const token = localStorage.getItem('token');
         const response = await fetch(`http://localhost:5000/api/terms/${selectedTerm.id}`, {
@@ -177,19 +181,16 @@ export const AdminComponent = () => {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ terms: selectedTerm.content }), // Certifique-se de que o campo corresponde ao backend
+          body: JSON.stringify({ terms: selectedTerm.terms }), // Certifique-se de que o campo corresponde ao backend
         });
-  
+
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(`Failed to update term: ${errorData.error || response.statusText}`);
         }
-  
-        // Atualiza a lista de termos com os dados retornados do servidor
+
         const updatedTerm = await response.json();
-        setTermsList(termsList.map(term =>
-          term.id === updatedTerm.id ? updatedTerm : term
-        ));
+        setTermsList(termsList.map(term => (term.id === updatedTerm.id ? updatedTerm : term)));
         onClose();
         toast({
           title: "Termo atualizado com sucesso.",
@@ -208,10 +209,6 @@ export const AdminComponent = () => {
       }
     }
   };
-
-  useEffect(() => {
-    fetchTerms();
-  }, []);
 
   return (
     <Box p={6}>
@@ -238,35 +235,34 @@ export const AdminComponent = () => {
               </Tr>
             </Thead>
             <Tbody>
-            {termsList.map((term) => (
-              <Tr key={term.id}>
-                <Td>
-                  <Text
-                    whiteSpace="nowrap"
-                    overflow="hidden"
-                    textOverflow="ellipsis"
-                    maxWidth="300px" // Ajuste o valor conforme necessário
-                  >
-                  {term.content}
-                  </Text>
-                </Td>
-                <Td                     
-                  display="flex"
-                  justifyContent="flex-end">
-
-                  <Button onClick={() => handleViewOrEditTerm(term)} bgColor={"lightgray"} mr={2}>
-                    Visualizar
-                  </Button>
-                  <Button onClick={() => handleViewOrEditTerm(term, true)} colorScheme="green" mr={2}>
-                    Editar
-                  </Button>
-                  <Button onClick={() => handleDeleteTerm(term.id)} colorScheme="red">
-                    Deletar
-                  </Button>
-                </Td>
-              </Tr>
-            ))}
-          </Tbody>
+              {termsList.map((term) => (
+                <Tr key={term.id}>
+                  <Td>
+                    <Text
+                      whiteSpace="nowrap"
+                      overflow="hidden"
+                      textOverflow="ellipsis"
+                      maxWidth="300px" // Ajuste o valor conforme necessário
+                    >
+                      {term.terms}
+                    </Text>
+                  </Td>
+                  <Td                     
+                    display="flex"
+                    justifyContent="flex-end">
+                    <Button onClick={() => handleViewOrEditTerm(term)} bgColor={"lightgray"} mr={2}>
+                      Visualizar
+                    </Button>
+                    <Button onClick={() => handleViewOrEditTerm(term, true)} colorScheme="green" mr={2}>
+                      Editar
+                    </Button>
+                    <Button onClick={() => handleDeleteTerm(term.id)} colorScheme="red">
+                      Deletar
+                    </Button>
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
           </Table>
         </TableContainer>
       </Box>
@@ -284,34 +280,33 @@ export const AdminComponent = () => {
         </Tooltip>
       </Box>
 
-      {/* Modal de visualização/edição */}
-      <Modal isOpen={isOpen} onClose={onClose}>
+      {/* Modal de Visualização/Edição */}
+      <Modal isOpen={isOpen} onClose={onClose} size="lg">
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>{isEditing ? "Editar Termo" : "Visualizar Termo"}</ModalHeader>
+          <ModalHeader>{isEditing ? 'Editar Termo' : 'Visualizar Termo'}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             {isEditing ? (
               <Input
-                value={selectedTerm?.content || ''} // Ensures controlled input
-                onChange={(e) => {
-                  if (selectedTerm) {
-                    setSelectedTerm({ ...selectedTerm, content: e.target.value });
-                  }
-                }}
-                placeholder="Digite o termo..."
+                value={selectedTerm?.terms || ''}
+                onChange={(e) => setSelectedTerm({ ...selectedTerm!, terms: e.target.value })}
+                placeholder="Digite os termos atualizados aqui..."
               />
             ) : (
-              <Text>{selectedTerm?.content}</Text>
+              <Text>{selectedTerm?.terms}</Text>
             )}
           </ModalBody>
           <ModalFooter>
-            {isEditing && (
+            {isEditing ? (
               <Button colorScheme="green" onClick={handleEditTerm}>
                 Salvar
               </Button>
+            ) : (
+              <Button colorScheme="gray" onClick={onClose}>
+                Fechar
+              </Button>
             )}
-            <Button colorScheme="red" onClick={onClose}>Fechar</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

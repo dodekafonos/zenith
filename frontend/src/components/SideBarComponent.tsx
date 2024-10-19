@@ -1,7 +1,8 @@
 import { Box, IconButton, VStack, Image, Tooltip } from '@chakra-ui/react';
-import { FaHome, FaChartBar, FaDatabase, FaSignOutAlt, FaFileMedical, FaSearch } from 'react-icons/fa';
+import { FaHome, FaChartBar, FaDatabase, FaSignOutAlt, FaFileMedical, FaSearch, FaPersonBooth } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/health2-removebg.png';
+import { FaPersonArrowDownToLine } from 'react-icons/fa6';
 
 interface SideBarProps {
   onSelect: (componentName: string) => void;
@@ -87,6 +88,17 @@ function SideBarComponent({ onSelect }: SideBarProps) {
             bgColor='green.900'
             _hover={{ bg: 'green.700' }}
             onClick={() => onSelect('recomendation')}
+            size="lg"
+          />
+        </Tooltip>
+        <Tooltip label="Profile" fontSize="md">
+          <IconButton 
+            icon={<FaPersonBooth size="28px" />} 
+            aria-label="profile" 
+            color='white'
+            bgColor='green.900'
+            _hover={{ bg: 'green.700' }}
+            onClick={() => onSelect('profile')}
             size="lg"
           />
         </Tooltip>

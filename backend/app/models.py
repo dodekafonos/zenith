@@ -26,8 +26,8 @@ class User:
         return check_password_hash(stored_password, provided_password)
 
     @staticmethod
-    def create_user(email, password):
-        user = User(email, password)
+    def create_user(email, password, acceptedTerms):
+        user = User(email, password, acceptedTerms)
         mongo.db.users.insert_one(user.to_dict())
 
 class Term:

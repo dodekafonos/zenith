@@ -22,8 +22,9 @@ import { useState, useEffect } from 'react';
 
 interface Term {
   id: string;
-  content: string; // Conteúdo do termo
+  terms: string; // Conteúdo do termo
   isRequired: boolean; // Se o termo é obrigatório
+  accepted_on?: string;
 }
 
 interface SignUpComponentProps {
@@ -94,11 +95,11 @@ function SignUpComponent({ setShowSignUp }: SignUpComponentProps) {
     onClose(); 
   };
 
-  const handleTermCheck = (termId: string) => {
-    if (acceptedTerms.includes(termId)) {
-      setAcceptedTerms(acceptedTerms.filter(id => id !== termId));
+  const handleTermCheck = (terms: string) => {
+    if (acceptedTerms.includes(terms)) {
+      setAcceptedTerms(acceptedTerms.filter(id => id !== terms));
     } else {
-      setAcceptedTerms([...acceptedTerms, termId]);
+      setAcceptedTerms([...acceptedTerms, terms]);
     }
   };
 
@@ -116,6 +117,8 @@ function SignUpComponent({ setShowSignUp }: SignUpComponentProps) {
           acceptedTerms,
         }),
       });
+
+      console.log(response)
 
       if (!response.ok) {
         throw new Error('Erro ao registrar usuário');
@@ -249,7 +252,7 @@ function SignUpComponent({ setShowSignUp }: SignUpComponentProps) {
                     >
                       {term.isRequired && <Text as="span" color="red.500">(Obrigatório)</Text>}
                     </Checkbox>
-                    <Text mt={1} color="gray.700">{term.content}</Text> {/* Exibindo o conteúdo dos termos */}
+                    <Text mt={1} color="gray.700">{term.terms}</Text> {/* Exibindo o conteúdo dos termos */}
                   </Box>
                 ))
               ) : (
