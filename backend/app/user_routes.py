@@ -1,11 +1,55 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, Response
 from werkzeug.security import generate_password_hash, check_password_hash  
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from . import mongo
 from bson import ObjectId  # Importa ObjectId
 import datetime  
+import json
+
 
 bp = Blueprint('user_routes', __name__)
+
+
+@bp.route('/user/export', methods=['GET'])
+@jwt_required()
+def export_user_data():
+    try:
+        current_user = get_jwt_identity()
+        
+        # Get all users or a specific user based on the request query
+        user_id = request.args.get('user_id')
+        if user_id:
+            user = mongo.db.users.find_one({"_id": ObjectId(user_id)})
+            if not user:
+                return jsonify({"message": "Usuário não encontrado"}), 404
+            # Export a specific user
+            users_data = [user]
+        else:
+            # Export all users
+            users_data = mongo.db.users.find()
+        
+        # Prepare data for export (convert MongoDB cursor to a list of dictionaries)
+        users_list = []
+        for user in users_data:
+            users_list.append({
+                "id": str(user["_id"]),
+                "name": user["name"],
+                "email": user["email"],
+                "role": user.get("role", "user"),
+                "acceptedTerms": user.get("acceptedTerms", False)
+            })
+        
+        # Prepare response as a JSON file download
+        response = Response(
+            json.dumps(users_list, default=str),
+            mimetype="application/json",
+            status=200
+        )
+        response.headers["Content-Disposition"] = "attachment; filename=users_export.json"
+        return response
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
+
 
 @bp.route('/register', methods=['POST'])
 def register():
